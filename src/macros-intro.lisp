@@ -108,6 +108,7 @@ Author points out that using macros make sense when:
              (t ,neg)))))
 
 #|
+Macros to uniquely generate
 |#
 (defun g!-symbol-p (s)
   (and (symbolp s)
@@ -117,25 +118,25 @@ Author points out that using macros make sense when:
                 :start1 0
                 :end1 2)))
 
-(defmacro defmacro/g! (name args &body body)
-  (let ((syms (remove-duplicates (remove-if-not
-                                  #'g!-symbol-p
-                                  (alexandria:flatten body)))))
-    `(defmacro ,name ,args
-       (let ,(mapcar
-              (lambda (s)
-                `(,s (gensym ,(subseq
-                               (symbol-name s)
-                               2))))
-              syms)
-         ,@body))))
+;;(defmacro defmacro/g! (name args &body body)
+;;  (let ((syms (remove-duplicates (remove-if-not
+;;                                  #'g!-symbol-p
+;;                                  (alexandria:flatten body)))))
+;;    `(defmacro ,name ,args
+;;       (let ,(mapcar
+;;              (lambda (s)
+;;                `(,s (gensym ,(subseq
+;;                               (symbol-name s)
+;;                               2))))
+;;              syms)
+;;         ,@body))))
 
 ;; second attempt
-(defmacro/g! nif (expr pos zero neg)
-    `(let ((,g!result ,expr))
-       (cond ((plusp ,g!result) ,pos)
-             ((zerop ,g!result) ,zero)
-             (t ,neg))))
+;;(defmacro/g! nif (expr pos zero neg)
+;;    `(let ((,g!result ,expr))
+;;       (cond ((plusp ,g!result) ,pos)
+;;             ((zerop ,g!result) ,zero)
+;;             (t ,neg))))
 
 ;; third attempt
 (defmacro nif (expr pos zero neg)
