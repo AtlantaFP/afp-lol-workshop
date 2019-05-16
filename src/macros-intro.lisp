@@ -43,7 +43,7 @@ the generated sleep call with the computed value as a constant
          ((h) 3600)))))
 
 ;; macroexpand the following example
-(sleep-units 5 m)
+;; (sleep-units 5 m)
 
 ;; even look at the disassembly
 ;; on SBCL all constants are left-shifted by a bit (looks like they are multiplied by 2)

@@ -17,6 +17,7 @@
                 ((:file "macros-intro")
                  (:file "macros-intro-once-only")
                  (:file "reader-macros-examples")
+		 (:file "programs-that-program")
                  (:file "afp-lol-workshop"))))
   :description "An overview of code from Let Over Lambda (plus a few extras)"
   :long-description

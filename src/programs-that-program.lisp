@@ -7,19 +7,7 @@
 (defun adder (x)
   (+ x 1))
 
-(defunits time s
-  m 60
-  h (60 m)
-  d (24 h)
-  ms (1/1000 s)
-  us (1/1000 ms))
-
-(defunits time s
-  m (1/60 h)
-  h (60 m))
-
-(unit-of-time 1 d) ;; (* 24 (* 60 (* 60 1)))
-
+;; example of defining macro for units of measure
 (defmacro defunits% (quantity base-unit &body units)
   (a:with-gensyms (val un)
      `(defmacro ,(a:symbolicate 'unit-of- quantity) (,val ,un)
@@ -61,6 +49,19 @@
                      nil)))
                (s:batches units 2))))))
 
+(defunits time s
+  m 60
+  h (60 m)
+  d (24 h)
+  ms (1/1000 s)
+  us (1/1000 ms))
+
+;; (defunits time s
+;;   m (1/60 h)
+;;   h (60 m))
+
+(unit-of-time 1 d) ;; (* 24 (* 60 (* 60 1)))
+
 (defun tree-leaves% (tree result)
   (when tree
       (if (listp tree)
@@ -70,17 +71,6 @@
            (tree-leaves% (cdr tree)
                          result))
           result)))
-
-(print (tree-leaves '(2 (nil t (a . b)))
-                    (lambda (x)
-                      (and (numberp x) (evenp x)))
-                    (lambda (x)
-                      (* x x))))
-
-
-(print (tree-leaves '(2 (nil t (a . b)))
-              (and (numberp it) (evenp it))
-              'even-number))
 
 (sort '(5 1 2 4 3) #'<)
 
@@ -101,6 +91,17 @@
                   (lambda (it)
                     (declare (ignorable it))
                     ,result)))
+(print (tree-leaves '(2 (nil t (a . b)))
+                    (lambda (x)
+                      (and (numberp x) (evenp x)))
+                    (lambda (x)
+                      (* x x))))
+
+
+(print (tree-leaves '(2 (nil t (a . b)))
+              (and (numberp it) (evenp it))
+              'even-number))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; macrolet
@@ -148,3 +149,157 @@
     (if (zerop n)
         acc
         (fact (- n 1) (* acc n)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Recursive Expansions
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro cxr% (x tree)
+  (if (null x)
+      tree
+      `(,(cond
+	   ((eq 'a (cadr x)) 'car)
+	   ((eq 'd (cadr x)) 'cdr)
+	   (t (error "Non A/D symbol")))
+	,(if (= 1 (car x))
+	     `(cxr% ,(cddr x) ,tree)
+	     `(cxr% ,(cons (- (car x) 1) (cdr x))
+		    ,tree)))))
+
+;; example usage
+(defun eleventh (x)
+  (cxr% (1 a 10 d) x))
+
+(defvar cxr-inline-thresh 10)
+
+(defmacro cxr (x tree)
+  (a:with-gensyms (name val count)
+    (if (null x)
+	tree
+	(let ((op (cond
+		    ((eq 'a (cadr x)) 'car)
+		    ((eq 'd (cadr x)) 'cdr)
+		    (t (error "Non A/D symbol")))))
+	  (if (and (integerp (car x))
+		   (<= 1 (car x) cxr-inline-thresh))
+	      (if (= 1 (car x))
+		  `(,op (cxr ,(cddr x) ,tree))
+		  `(,op (cxr ,(cons (- (car x) 1) (cdr x))
+			     ,tree)))
+	      `(nlet-tail
+		   ,name ((,count ,(car x))
+			  (,val (cxr ,(cddr x) ,tree)))
+		 (if (>= 0 ,count)
+		     ,val
+		     (,name (- ,count 1)
+			    (,op ,val)))))))))
+
+(defun nthcdr% (n list)
+  (cxr (n d) list))
+
+(defun nth% (n list)
+  (cxr (1 a n d) list))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Recursive Solutions
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro def-english-list-accessors (start end)
+  (when (not (<= 1 start end))
+    (error "Bad start/end range"))
+  `(progn
+     ,@(loop :for i
+	     :from start
+	       :to end
+	     :collect
+	     `(defun
+		  ,(a:symbolicate
+		    (map 'string
+			 (lambda (c)
+			   (if (alpha-char-p c)
+			       (char-upcase c)
+			       #\-))
+			 (format nil "~:r" i)))
+		  (arg)
+		(cxr (1 a ,(- i 1) d) arg)))))
+
+
+(defun cxr-symbol-p (s)
+  (if (symbolp s)
+      (let ((chars (coerce
+		    (symbol-name s)
+		    'list)))
+	(and
+	 (< 6 (length chars))
+	 (char= #\C (car chars))
+	 (char= #\R (car (last chars)))
+	 (null (remove-if
+		(lambda (c)
+		  (or (char= c #\A)
+		      (char= c #\D)))
+		(cdr (butlast chars))))))))
+
+(defun cxr-symbol-to-cxr-list (s)
+  (labels ((collect (l)
+	     (if l
+		 (list*  1
+			 (if (char= (car l) #\A)
+			     'A
+			     'D)
+			 (collect (cdr l))))))
+    (collect
+	(cdr      ; chop off c
+	 (butlast ; chop off R
+	  (coerce
+	   (symbol-name s)
+	   'list))))))
+
+(defmacro with-all-cxrs (&rest forms)
+  `(labels
+       (,@(mapcar
+	    (lambda (s)
+	      `(,s (l)
+		   (cxr ,(cxr-symbol-to-cxr-list s)
+			l)))
+	    (remove-duplicates
+	     (remove-if-not
+	      #'cxr-symbol-p
+	      (a:flatten forms)))))))
+
+(with-all-cxrs #'cadadadadr)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Dlambda
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro dlambda (&rest ds)
+  (a:with-gensyms (args)
+    `(lambda (&rest ,args)
+       (case (car ,args)
+	 ,@(mapcar
+	    (lambda (d)
+	      `(,(if (eq t (car d))
+		     t
+		     (list (car d)))
+		(apply (lambda ,@(cdr d))
+		       ,(if (eq t (car d))
+			    args
+			    `(cdr ,args)))))
+	    ds)))))
+
+;; example usage of dlambda: creating a counter with multiple methods
+(setf (symbol-function 'count-test)
+      (let ((count 0))
+	(dlambda
+	 (:inc () (incf count))
+	 (:dec () (decf count))
+	 (:reset () (setf count 0)))))
+
+
+		

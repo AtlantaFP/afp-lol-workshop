@@ -26,7 +26,7 @@ discussion of different splicing operations
   (let ((lst '(b c d)))
     (print `(a
        ,.(mapcar #'identity lst)
-       e))
+p       e))
     lst))
 
 #|
@@ -69,4 +69,4 @@ Macros leverage two main things
   (print (square (incf x))))
 
 ;; example of what NOT to do (side-effect unexpected)
-(print (loop :for i :from 1 :to 5 :collect (square i))))
+(print (loop :for i :from 1 :to 5 :collect (square i)))
