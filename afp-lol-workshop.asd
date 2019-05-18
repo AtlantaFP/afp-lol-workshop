@@ -11,14 +11,15 @@
   :version "0.1.0"
   :author "Atlanta Functional Programming"
   :license ""
-  :depends-on (:alexandria :cl-ppcre)
+  :depends-on (:alexandria :serapeum :cl-ppcre)
   :components ((:module "src"
                 :components
-                ((:file "macros-intro")
-                 (:file "macros-intro-once-only")
-                 (:file "reader-macros-examples")
-		 (:file "programs-that-program")
-                 (:file "afp-lol-workshop"))))
+                        ((:file "macros-intro")
+                         (:file "macros-intro-once-only")
+                         (:file "reader-macros-examples")
+                         (:file "programs-that-program")
+                         (:file "anaphoric-macros")
+                         (:file "afp-lol-workshop"))))
   :description "An overview of code from Let Over Lambda (plus a few extras)"
   :long-description
   #.(read-file-string

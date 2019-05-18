@@ -54,9 +54,9 @@ properly escaped
 
 (set-dispatch-macro-character #\# #\> #'|#>-reader|)
 
-#>END
-This is a "test"...
-END
+;;#>END
+;;This is a "test"...
+;;END
 
 ;; version from the production repo ()
 (eval-when (:compile-toplevel :load-toplevel :execute)
