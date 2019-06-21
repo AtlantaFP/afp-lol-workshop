@@ -122,7 +122,7 @@
         acc
         (fact (- n 1) (* acc n)))))
 
-;; tail recursive version of nlet macro
+;; tail recursive version of nlet macro that leverages macrolet
 (defmacro nlet-tail (n letargs &body body)
   (a:with-gensyms (nn b)
     (let ((gs (loop :for i
@@ -131,7 +131,7 @@
       `(macrolet
            ((,n ,gs
               `(progn
-                 (psetq
+                 (psetf
                   ,@(apply #'nconc
                            (mapcar
                             #'list
@@ -149,6 +149,21 @@
     (if (zerop n)
         acc
         (fact (- n 1) (* acc n)))))
+
+(macrolet ((fact (g745 g746)
+             `(progn
+                (psetf ,@(apply #'nconc
+                                (mapcar #'list '(n acc) (list g745 g746))))
+                (go ,'nn743))))
+  (block b744
+    (let ((n n) (acc 1))
+      (tagbody
+         nn743
+         (return-from b744
+           (progn
+             (if (zerop n)
+                 acc
+                 (fact (- n 1) (* acc n)))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -278,6 +293,14 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defparameter *test-counter* (let ((count 0))
+   (lambda (msg)
+     (case msg
+       (:inc
+        (incf count))
+       (:dec
+        (decf count))))))
+
 (defmacro dlambda (&rest ds)
   (a:with-gensyms (args)
     `(lambda (&rest ,args)
@@ -286,7 +309,7 @@
 	    (lambda (d)
 	      `(,(if (eq t (car d))
 		     t
-		     (list (car d)))
+		     (car d))
 		(apply (lambda ,@(cdr d))
 		       ,(if (eq t (car d))
 			    args
