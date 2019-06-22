@@ -91,3 +91,30 @@
            ,(pandoriclet-set letargs))
          (t (&rest args)
            (apply this args))))))
+
+(declaim (inline get-pandoric))
+
+(defun get-pandoric (box sym)
+  (funcall box :pandoric-get sym))
+
+(defsetf get-pandoric (box sym) (val)
+  `(progn
+     (funcall ,box :pandoric-set ,sym ,val)
+     ,val))
+
+
+;; with-pandoric
+(a:with-gensyms (obox)
+  `(defmacro with-pandoric (syms ,obox &body body)
+    (a:with-gensyms (gbox)
+      `(symbol-macrolet
+	   (,@(mapcar #`(,a1 (get-pandoric ,gbox ',a1))
+		      syms))
+	 ,@body))))
+
+
+;; Example of everything put together
+
+(setf (symbol-function 'pantest)
+    (pandoriclet ((acc 0))
+      (lambda (n) (incf acc n))))
