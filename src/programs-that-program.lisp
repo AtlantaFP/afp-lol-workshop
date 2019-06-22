@@ -49,18 +49,18 @@
                      nil)))
                (s:batches units 2))))))
 
-(defunits time s
-  m 60
-  h (60 m)
-  d (24 h)
-  ms (1/1000 s)
-  us (1/1000 ms))
+;; (defunits time s
+;;   m 60
+;;   h (60 m)
+;;   d (24 h)
+;;   ms (1/1000 s)
+;;   us (1/1000 ms))
 
 ;; (defunits time s
 ;;   m (1/60 h)
 ;;   h (60 m))
 
-(unit-of-time 1 d) ;; (* 24 (* 60 (* 60 1)))
+;;(unit-of-time 1 d) ;; (* 24 (* 60 (* 60 1)))
 
 (defun tree-leaves% (tree result)
   (when tree
@@ -150,20 +150,20 @@
         acc
         (fact (- n 1) (* acc n)))))
 
-(macrolet ((fact (g745 g746)
-             `(progn
-                (psetf ,@(apply #'nconc
-                                (mapcar #'list '(n acc) (list g745 g746))))
-                (go ,'nn743))))
-  (block b744
-    (let ((n n) (acc 1))
-      (tagbody
-         nn743
-         (return-from b744
-           (progn
-             (if (zerop n)
-                 acc
-                 (fact (- n 1) (* acc n)))))))))
+;; (macrolet ((fact (g745 g746)
+;;              `(progn
+;;                 (psetf ,@(apply #'nconc
+;;                                 (mapcar #'list '(n acc) (list g745 g746))))
+;;                 (go ,'nn743))))
+;;   (block b744
+;;     (let ((n n) (acc 1))
+;;       (tagbody
+;;          nn743
+;;          (return-from b744
+;;            (progn
+;;              (if (zerop n)
+;;                  acc
+;;                  (fact (- n 1) (* acc n)))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -187,7 +187,7 @@
 (defun eleventh (x)
   (cxr% (1 a 10 d) x))
 
-(defvar cxr-inline-thresh 10)
+(defparameter cxr-inline-thresh 10)
 
 (defmacro cxr (x tree)
   (a:with-gensyms (name val count)
@@ -211,11 +211,11 @@
 		     (,name (- ,count 1)
 			    (,op ,val)))))))))
 
-(defun nthcdr% (n list)
-  (cxr (n d) list))
+;; (defun nthcdr% (n list)
+;;   (cxr (n d) list))
 
-(defun nth% (n list)
-  (cxr (1 a n d) list))
+;; (defun nth% (n list)
+;;   (cxr (1 a n d) list))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -285,7 +285,7 @@
 	      #'cxr-symbol-p
 	      (a:flatten forms)))))))
 
-(with-all-cxrs #'cadadadadr)
+;; (with-all-cxrs #'cadadadadr)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
