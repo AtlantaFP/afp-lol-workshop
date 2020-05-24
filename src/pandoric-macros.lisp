@@ -6,9 +6,9 @@
 (in-package :afp-lol-workshop.pandoric-macros)
 
 ;; motivation: use of with-slots
-(define-handy-method (double (o Point))
-    (set! x (* 2 x))
-  (set! y (* 2 y)))
+;; (define-handy-method (double (o Point))
+;;     (set! x (* 2 x))
+;;   (set! y (* 2 y)))
 
 (defclass student ()
   ((name :accessor name :initarg :name)
@@ -76,8 +76,8 @@
                    (setq ,(car a1) val))
                letargs)
      (t (error
-          "Unknown pandoric set: ~a ~a"
-          sym val))))
+          "Unknown pandoric set: ~a"
+          sym))))
 
 (defmacro pandoriclet (letargs &body body)
   (let ((letargs (cons
@@ -111,9 +111,6 @@
     `(symbol-macrolet (,@(mapcar (s:op `(,_1 (get-pandoric ,obox ',_1)))
                                  syms))
        ,@body)))
-
-(with-pandoric (acc) #'pantest
-  (format t "Value of acc: ~a~%" acc))
 
 (defun pandoric-hotpatch (box new)
   (with-pandoric (this) box
@@ -212,3 +209,7 @@
 (let ((x 1))
   (pandoric-eval (x)
                  '(+ 1 x)))
+
+;; (with-pandoric (acc) #'pantest
+;;   (format t "Value of acc: ~a~%" acc))
+
