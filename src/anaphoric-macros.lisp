@@ -13,11 +13,11 @@
   (loop :for i :from 1 :to 1000000000 :when i :sum :it))
 
 ;; in real code we would assign this to a variable and 
- (let ((result (some-long-calculation)))
-   (foo result))
+;;  (let ((result (some-long-calculation)))
+;;    (foo result))
 
-(aif (some-long-calculation)
-     (foo it))
+;; (aif (some-long-calculation)
+;;      (foo it))
 
 ;; Graham's aif (canonical example)
 (defmacro aif (test then &optional else)
@@ -38,8 +38,8 @@
         ((null (cdr args)) (car args))
         (t `(awhen ,(car args) (aand ,@(cdr args))))))
 
-(if (aand (owner it) (address it) (town it))
-  (some-long-calculation))
+;; (if (aand (owner it) (address it) (town it))
+;;   (some-long-calculation))
 
 ;; Graham's alambda and ablock
 (defmacro alambda (parms &body body)
@@ -91,7 +91,7 @@
 
 '#`((,a1))
 
- use numarg parameter of read macro
+;; use numarg parameter of read macro
 '#2`(,a1 ,a2)
 
 ;; example of initializing using new reader macro
