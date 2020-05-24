@@ -1,6 +1,5 @@
 (defpackage :afp-lol-workshop.type-system-intro
-  (:use :cl)
-  (:local-nicknames (:a :alexandria)))
+  (:use :cl))
 
 (in-package :afp-lol-workshop.type-system-intro)
 

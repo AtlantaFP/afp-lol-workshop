@@ -1,6 +1,5 @@
 (defpackage :afp-lol-workshop.anaphoric-macros
   (:use :cl)
-  (:local-nicknames (:a :alexandria) (:s :serapeum))
   (:nicknames "anaphoric-macros"))
 
 (in-package :afp-lol-workshop.anaphoric-macros)
@@ -110,14 +109,14 @@
 
 ;; serapeum example of above code with op
 (let ((vars '(var-a var-b var-c)))
-  (mapcar (s:op `(,_1 ,_2))
+  (mapcar (serapeum:op `(,_1 ,_2))
           vars
           (loop :for var :in vars
                 :collect (gensym (symbol-name var)))))
 
 ;; this example leverages 
 (let ((vars '(var-a var-b var-c)))
-  (mapcar (s:op `(,_ ,_))
+  (mapcar (serapeum:op `(,_ ,_))
           vars
           (loop :for var :in vars
                 :collect (gensym (symbol-name var)))))
@@ -132,7 +131,7 @@
 
 ;; alet% over dlambda
 (defmacro dlambda (&rest ds)
-  (a:with-gensyms (args)
+  (alexandria:with-gensyms (args)
     `(lambda (&rest ,args)
        (case (car ,args)
          ,@(mapcar

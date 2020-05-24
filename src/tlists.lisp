@@ -1,6 +1,5 @@
 (defpackage :afp.lol.tlists
-  (:use :cl)
-  (:local-nicknames (:a :alexandria) (:s :serapeum)))
+  (:use :cl))
 
 (in-package :afp.lol.tlists)
 
