@@ -1,6 +1,5 @@
 (defpackage :afp-lol-workshop.pandoric-macros
   (:use :cl)
-  (:local-nicknames (:a :alexandria) (:s :serapeum))
   (:nicknames "pandoric-macros"))
 
 (in-package :afp-lol-workshop.pandoric-macros)
@@ -25,7 +24,7 @@
   (values (intern (apply #'mkstr args))))
 
 (defmacro dlambda (&rest ds)
-  (a:with-gensyms (args)
+  (alexandria:with-gensyms (args)
     `(lambda (&rest ,args)
        (case (car ,args)
          ,@(mapcar
@@ -107,8 +106,8 @@
 
 ;; with-pandoric
 (defmacro with-pandoric (syms obox &body body)
-  (a:once-only (obox)
-    `(symbol-macrolet (,@(mapcar (s:op `(,_1 (get-pandoric ,obox ',_1)))
+  (alexandria:once-only (obox)
+    `(symbol-macrolet (,@(mapcar (serapeum:op `(,_1 (get-pandoric ,obox ',_1)))
                                  syms))
        ,@body)))
 

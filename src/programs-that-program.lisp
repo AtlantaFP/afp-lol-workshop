@@ -1,6 +1,5 @@
 (defpackage :programs-that-program
-  (:use :cl)
-  (:local-nicknames (:a :alexandria) (:s :serapeum)))
+  (:use :cl))
 
 (in-package :programs-that-program)
 
@@ -9,14 +8,14 @@
 
 ;; example of defining macro for units of measure
 (defmacro defunits% (quantity base-unit &body units)
-  (a:with-gensyms (val un)
-     `(defmacro ,(a:symbolicate 'unit-of- quantity) (,val ,un)
+  (alexandria:with-gensyms (val un)
+     `(defmacro ,(alexandria:symbolicate 'unit-of- quantity) (,val ,un)
        `(* ,,val
            ,(case ,un
               (,base-unit 1)
               ,@(mapcar (lambda (x)
                           `(,(car x) ,(cadr x)))
-                 (s:batches units 2)))))))
+                 (serapeum:batches units 2)))))))
 
 (defun %defunits-chaining (u units prev)
   (when (member u prev)
@@ -34,7 +33,7 @@
         (error "Unknown unit: ~a" u))))
 
 (defmacro defunits (quantity base-unit &body units)
-  `(defmacro ,(a:symbolicate 'unit-of- quantity) (value unit)
+  `(defmacro ,(alexandria:symbolicate 'unit-of- quantity) (value unit)
      `(* ,value
          ,(case unit
             ((,base-unit) 1)
@@ -45,9 +44,9 @@
                      (car x)
                      (cons
                       `(,base-unit 1)
-                      (s:batches units 2))
+                      (serapeum:batches units 2))
                      nil)))
-               (s:batches units 2))))))
+               (serapeum:batches units 2))))))
 
 ;; (defunits time s
 ;;   m 60
@@ -124,7 +123,7 @@
 
 ;; tail recursive version of nlet macro that leverages macrolet
 (defmacro nlet-tail (n letargs &body body)
-  (a:with-gensyms (nn b)
+  (alexandria:with-gensyms (nn b)
     (let ((gs (loop :for i
                     :in letargs
                     :collect (gensym))))
@@ -190,7 +189,7 @@
 (defparameter cxr-inline-thresh 10)
 
 (defmacro cxr (x tree)
-  (a:with-gensyms (name val count)
+  (alexandria:with-gensyms (name val count)
     (if (null x)
 	tree
 	(let ((op (cond
@@ -232,7 +231,7 @@
 	       :to end
 	     :collect
 	     `(defun
-		  ,(a:symbolicate
+		  ,(alexandria:symbolicate
 		    (map 'string
 			 (lambda (c)
 			   (if (alpha-char-p c)
@@ -283,7 +282,7 @@
 	    (remove-duplicates
 	     (remove-if-not
 	      #'cxr-symbol-p
-	      (a:flatten forms)))))))
+	      (alexandria:flatten forms)))))))
 
 ;; (with-all-cxrs #'cadadadadr)
 
@@ -302,7 +301,7 @@
         (decf count))))))
 
 (defmacro dlambda (&rest ds)
-  (a:with-gensyms (args)
+  (alexandria:with-gensyms (args)
     `(lambda (&rest ,args)
        (case (car ,args)
 	 ,@(mapcar

@@ -1,6 +1,5 @@
 (defpackage :afp.lol.workshop.efficiency-topics
   (:use :cl :sb-alien)
-  (:local-nicknames (:a :alexandria) (:s :serapeum))
   (:nicknames :efficiency))
 
 (in-package :afp.lol.workshop.efficiency-topics)

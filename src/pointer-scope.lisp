@@ -1,6 +1,5 @@
 (defpackage :afp.lol.pointer-scope
-  (:use :cl)
-  (:local-nicknames (:a :alexandria)))
+  (:use :cl))
 
 (in-package :afp.lol.pointer-scope)
 

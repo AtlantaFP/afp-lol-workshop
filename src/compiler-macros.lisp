@@ -1,5 +1,4 @@
 (defpackage :afp-lol-workshop.compiler-macros
-  (:use :cl)
-  (:local-nicknames (:a :alexandria) (:s :serapeum)))
+  (:use :cl))
 
 (in-package :afp-lol-workshop.compiler-macros)
