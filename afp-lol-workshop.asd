@@ -11,7 +11,7 @@
   :version "0.1.0"
   :author "Atlanta Functional Programming"
   :license ""
-  :depends-on (:alexandria :serapeum :cl-ppcre)
+  :depends-on (:alexandria :serapeum :cl-ppcre :named-readtables)
   :components ((:module "src"
                 :components
                         ((:file "macros-intro")

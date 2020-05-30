@@ -1,6 +1,10 @@
 (defpackage :afp-lol-workshop.pandoric-macros
   (:use :cl)
-  (:nicknames "pandoric-macros"))
+  (:nicknames "pandoric-macros")
+  (:export
+   #:pandoriclet-get
+   #:pandoriclet-set
+   #:plambda))
 
 (in-package :afp-lol-workshop.pandoric-macros)
 

@@ -1,9 +1,13 @@
 (defpackage :afp-lol-workshop.anaphoric-macros
   (:use :cl)
-  (:nicknames "anaphoric-macros"))
+  (:nicknames "anaphoric-macros")
+  (:export
+   #:|#`-reader|
+   #:alet
+   #:alet%))
 
 (in-package :afp-lol-workshop.anaphoric-macros)
-
+  
 ;; Many of these code examples are from Let over Lambda Chapter 6
 ;; and On Lisp Ch. 14
 
@@ -25,7 +29,7 @@
 
 ;; Graham's awhen
 (defmacro awhen (test-form &body body)
-  `(aif ,test-form
+p  `(aif ,test-form
         (progn ,@body)))
 
 (defmacro aunless (test-form &body body)
@@ -72,21 +76,29 @@
    (return-from north-pole)))
 
 ;; sharp backquote
-(defun mkstr (&rest args) (with-output-to-string (s)
-                            (dolist (a args) (princ a s))))
-(defun symb (&rest args)
-  (values (intern (apply #'mkstr args))))
+;; (defun mkstr (&rest args) (with-output-to-string (s)
+;;                             (dolist (a args) (princ a s))))
+;; (defun symb (&rest args)
+;;   (values (intern (apply #'mkstr args))))
 
 (defun |#`-reader| (stream sub-char numarg)
   (declare (ignore sub-char))
   (unless numarg (setq numarg 1))
   `(lambda ,(loop for i from 1 to numarg
-                  collect (symb 'a i))
+                  collect (alexandria:symbolicate 'a i))
      ,(funcall
        (get-macro-character #\`) stream nil)))
 
-(set-dispatch-macro-character
-  #\# #\` #'|#`-reader|)
+(named-readtables:defreadtable |reader-macros|
+  (:merge :current)
+  (:dispatch-macro-char #\# #\` #'|#`-reader|)
+  (:case :preserve))
+
+
+(named-readtables:in-readtable |anaphoric-reader-macros|)
+
+;; (set-dispatch-macro-character
+ ;; #\# #\` #'|#`-reader|)
 
 '#`((,a1))
 
@@ -121,6 +133,13 @@
           (loop :for var :in vars
                 :collect (gensym (symbol-name var)))))
 
+
+(defmacro alet (letargs &body body)
+  `(let ((this) ,@letargs)
+     (setq this ,@(last body))
+     ,@(butlast body)
+     (lambda (&rest params)
+       (apply this params))))
 
 ;; Indirection chaining
 (defmacro alet% (letargs &rest body)
@@ -159,3 +178,5 @@
                   mul (* mul n)
                   expt (expt expt n))
            (list sum mul expt))))
+
+(named-readtables:in-readtable :standard)
