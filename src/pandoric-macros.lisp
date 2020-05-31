@@ -1,12 +1,10 @@
 (defpackage :afp-lol-workshop.pandoric-macros
   (:use :cl)
-  (:nicknames "pandoric-macros")
-  (:export
-   #:pandoriclet-get
-   #:pandoriclet-set
-   #:plambda))
+  (:nicknames "pandoric-macros"))
 
 (in-package :afp-lol-workshop.pandoric-macros)
+
+(named-readtables:in-readtable :reader-macros)
 
 ;; motivation: use of with-slots
 ;; (define-handy-method (double (o Point))
@@ -108,7 +106,7 @@
      (funcall ,box :pandoric-set ,sym ,val)
      ,val))
 
-;; with-pandoric
+;; with-pandoricp
 (defmacro with-pandoric (syms obox &body body)
   (alexandria:once-only (obox)
     `(symbol-macrolet (,@(mapcar (serapeum:op `(,_1 (get-pandoric ,obox ',_1)))
@@ -216,3 +214,4 @@
 ;; (with-pandoric (acc) #'pantest
 ;;   (format t "Value of acc: ~a~%" acc))
 
+(named-readtables:in-readtable :standard)
