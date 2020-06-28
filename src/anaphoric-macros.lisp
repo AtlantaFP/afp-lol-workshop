@@ -1,6 +1,6 @@
 (defpackage :afp-lol-workshop.anaphoric-macros
   (:use :cl)
-  (:nicknames "anaphoric-macros")
+  (:nicknames :anaphoric-macros)
   (:export
    #:|#`-reader|
    #:alet

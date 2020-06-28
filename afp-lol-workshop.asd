@@ -14,8 +14,7 @@
   :depends-on (:alexandria :serapeum :cl-ppcre)
   :components ((:module "src"
                 :components
-		(
-		 (:file "readtables")
+		((:file "readtables")
 		 (:file "macros-intro")
                  (:file "macros-intro-once-only")
                  (:file "reader-macros-examples")

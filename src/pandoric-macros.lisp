@@ -1,6 +1,11 @@
 (defpackage :afp-lol-workshop.pandoric-macros
   (:use :cl)
-  (:nicknames "pandoric-macros"))
+  (:nicknames :pandoric-macros)
+  (:export
+   #:let-binding-transform
+   #:with-pandoric
+   #:dlambda
+   #:plambda))
 
 (in-package :afp-lol-workshop.pandoric-macros)
 
@@ -20,10 +25,10 @@
   (with-slots (year-in-school) o
     (setf year-in-school new-year)))
 
-(defun mkstr (&rest args) (with-output-to-string (s)
-                            (dolist (a args) (princ a s))))
-(defun symb (&rest args)
-  (values (intern (apply #'mkstr args))))
+;; (defun mkstr (&rest args) (with-output-to-string (s)
+;;                             (dolist (a args) (princ a s))))
+;; (defun symb (&rest args)
+;;   (values (intern (apply #'mkstr args))))
 
 (defmacro dlambda (&rest ds)
   (alexandria:with-gensyms (args)
@@ -40,60 +45,48 @@
                             `(cdr ,args)))))
             ds)))))
 
-(defun |#`-reader| (stream sub-char numarg)
-  (declare (ignore sub-char))
-  (unless numarg (setq numarg 1))
-  `(lambda ,(loop for i from 1 to numarg
-                  collect (symb 'a i))
-     ,(funcall
-       (get-macro-character #\`) stream nil)))
-
-(set-dispatch-macro-character
-  #\# #\` #'|#`-reader|)
-
-
 (defun let-binding-transform (bs)
   (if bs
-    (cons
-      (cond ((symbolp (car bs))
+      (cons
+       (cond ((symbolp (car bs))
               (list (car bs)))
-            ((consp (car bs))
+             ((consp (car bs))
               (car bs))
-            (t
+             (t
               (error "Bad let bindings")))
-      (let-binding-transform (cdr bs)))))
+       (let-binding-transform (cdr bs)))))
 
 (defun pandoriclet-get (letargs)
   `(case sym
      ,@(mapcar #`((,(car a1)) ,(car a1))
-               letargs)
+        letargs)
      (t (error
-          "Unknown pandoric get: ~a"
-          sym))))
+         "Unknown pandoric get: ~a"
+         sym))))
 
 (defun pandoriclet-set (letargs)
   `(case sym
      ,@(mapcar #`((,(car a1))
-                   (setq ,(car a1) val))
-               letargs)
+                  (setq ,(car a1) val))
+        letargs)
      (t (error
-          "Unknown pandoric set: ~a"
-          sym))))
+         "Unknown pandoric set: ~a"
+         sym))))
 
 (defmacro pandoriclet (letargs &body body)
   (let ((letargs (cons
-                   '(this)
-                   (let-binding-transform
-                     letargs))))
+                  '(this)
+                  (let-binding-transform
+                   letargs))))
     `(let (,@letargs)
        (setq this ,@(last body))
        ,@(butlast body)
-       (dlambda 
-         (:pandoric-get (sym)
-           ,(pandoriclet-get letargs))
-         (:pandoric-set (sym val)
-           ,(pandoriclet-set letargs))
-         (t (&rest args)
+       (dlambda
+        (:pandoric-get (sym)
+                       ,(pandoriclet-get letargs))
+        (:pandoric-set (sym val)
+                       ,(pandoriclet-set letargs))
+        (t (&rest args)
            (apply this args))))))
 
 (declaim (inline get-pandoric))
@@ -124,8 +117,8 @@
 ;; Example of everything put together
 
 (setf (symbol-function 'pantest)
-    (pandoriclet ((acc 0))
-      (lambda (n) (incf acc n))))
+      (pandoriclet ((acc 0))
+        (lambda (n) (incf acc n))))
 
 (pandoric-hotpatch #'pantest
                    (let ((acc 100))
