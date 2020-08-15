@@ -3,8 +3,10 @@
   (:nicknames :anaphoric-macros)
   (:export
    #:|#`-reader|
+   #:self
    #:alet
-   #:alet%))
+   #:alet%
+   #:alambda))
 
 (in-package :afp-lol-workshop.anaphoric-macros)
   
